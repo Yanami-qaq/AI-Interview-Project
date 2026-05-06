@@ -26,6 +26,11 @@ TOPIC_RULES = {
     "backend_design": ("接口设计", "系统设计", "幂等", "性能优化", "日志", "安全", "限流", "降级"),
     "project": ("项目", "实践", "排查", "复盘", "案例", "落地"),
     "behavioral": ("沟通", "协作", "冲突", "压力", "成长", "复盘"),
+    "frontend_basic": ("前端基础", "html", "css", "javascript", "js", "dom", "bom", "事件循环"),
+    "browser": ("浏览器", "渲染", "重排", "重绘", "缓存", "跨域", "同源策略"),
+    "frontend_framework": ("react", "vue", "组件化", "hooks", "状态管理", "虚拟dom"),
+    "frontend_engineering": ("工程化", "webpack", "vite", "babel", "打包", "构建", "npm", "pnpm"),
+    "frontend_performance": ("性能优化", "首屏", "懒加载", "code split", "代码分割", "性能指标", "优化"),
 }
 
 QUESTION_TYPE_RULES = {
@@ -56,6 +61,16 @@ TOPIC_LABEL_MAP = {
     "项目经验": "project",
     "项目": "project",
     "行为题": "behavioral",
+    "前端基础": "frontend_basic",
+    "浏览器": "browser",
+    "浏览器原理": "browser",
+    "框架": "frontend_framework",
+    "react": "frontend_framework",
+    "vue": "frontend_framework",
+    "前端工程化": "frontend_engineering",
+    "工程化": "frontend_engineering",
+    "前端性能优化": "frontend_performance",
+    "性能优化": "frontend_performance",
 }
 
 QUESTION_TYPE_LABEL_MAP = {
