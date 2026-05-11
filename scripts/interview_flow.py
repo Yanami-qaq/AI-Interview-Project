@@ -1744,6 +1744,20 @@ def build_report_view_model(report: dict[str, Any]) -> dict[str, Any]:
         for item in report["recommended_resources"]
     ]
 
+    conversation = []
+    for item in report["session"].get("history", []):
+        msg = (item.get("interviewer_decision") or {}).get("message") or item.get("follow_up", "")
+        conv_item = {
+            "question_id": item.get("question_id", ""),
+            "question": item.get("question", ""),
+            "answer": item.get("answer", ""),
+            "interviewer_message": msg,
+            "score": item.get("evaluation", {}).get("score"),
+            "scored": item.get("scored", False),
+        }
+        if conv_item["question"] or conv_item["answer"]:
+            conversation.append(conv_item)
+
     return {
         "session_id": report["session_id"],
         "role": report["role"],
@@ -1766,6 +1780,7 @@ def build_report_view_model(report: dict[str, Any]) -> dict[str, Any]:
         "rounds_detail": rounds,
         "action_plan": action_plan,
         "recommended_resources": recommended_resources,
+        "conversation": conversation,
     }
 
 

@@ -235,6 +235,34 @@ class InterviewApiHandler(BaseHTTPRequestHandler):
                 self._json_response(report)
                 return
 
+            if path == "/history":
+                sessions = []
+                runtime_path = self._runtime_dir()
+                if runtime_path.exists():
+                    for f in sorted(runtime_path.glob("*.json"), key=lambda x: x.stat().st_mtime, reverse=True)[:30]:
+                        try:
+                            data = json.loads(f.read_text(encoding="utf-8"))
+                            history = data.get("history", [])
+                            scored = [h for h in history if h.get("scored")]
+                            scores = [
+                                h["evaluation"]["score"]
+                                for h in scored
+                                if isinstance(h.get("evaluation", {}).get("score"), (int, float))
+                            ]
+                            sessions.append({
+                                "session_id": data.get("session_id", f.stem),
+                                "role_label": data.get("role_label", ""),
+                                "role": data.get("role", ""),
+                                "created_at": data.get("created_at", ""),
+                                "status": data.get("status", "unknown"),
+                                "rounds": len(scored),
+                                "score": round(sum(scores) / len(scores), 1) if scores else None,
+                            })
+                        except Exception:
+                            continue
+                self._json_response({"sessions": sessions})
+                return
+
             self._json_response({"error": "Not found"}, status=HTTPStatus.NOT_FOUND)
         except FileNotFoundError as exc:
             self._json_response({"error": str(exc)}, status=HTTPStatus.NOT_FOUND)

@@ -109,6 +109,14 @@
         </div>
       </section>
 
+      <section class="panel history-panel" id="historyPanel" hidden>
+        <div class="history-header">
+          <span class="section-kicker">Past Sessions</span>
+          <h2>历史记录</h2>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+
       <section class="view" id="interviewView">
         <div class="interview-layout">
           <section class="panel conversation-panel">
@@ -236,6 +244,11 @@
                 <li>报告生成后显示。</li>
               </ul>
             </div>
+          </div>
+
+          <div class="conv-history flat-section" id="reportConversation" hidden>
+            <h3>对话回顾</h3>
+            <div class="conv-list" id="convList"></div>
           </div>
 
           <div class="report-columns">

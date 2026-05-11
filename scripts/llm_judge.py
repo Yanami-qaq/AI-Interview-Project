@@ -77,7 +77,8 @@ def load_llm_judge_config(
     max_score_delta: float | None = None,
 ) -> LlmJudgeConfig:
     load_env_file()
-    env_enabled = os.getenv("LLM_JUDGE_ENABLED", "").strip().lower() in {"1", "true", "yes", "on"}
+    env_flag = os.getenv("LLM_JUDGE_ENABLED", "").strip().lower()
+    env_enabled = env_flag not in {"0", "false", "no", "off"}
     resolved_enabled = env_enabled if enabled is None else enabled
     resolved_api_url = api_url or os.getenv("LLM_JUDGE_API_URL", "").strip()
     resolved_model = model or os.getenv("LLM_JUDGE_MODEL", "").strip()
@@ -274,6 +275,14 @@ def _call_openai_compatible(config: LlmJudgeConfig, payload: dict[str, Any]) -> 
                     "评分前必须先判断回答是否回应了当前题目。"
                     "如果回答与题目无关或明显跑题，总分必须在 0-2 分，技术准确性和要点覆盖度必须很低。"
                     "不要凭空认定候选人说过没有出现的内容，不要改变题目。"
+                    "各维度评分标准（0-10分）："
+                    "0-2分：完全偏题、空白或存在严重技术错误；"
+                    "3-4分：提及关键词但核心原理有重大缺失或理解偏差；"
+                    "5-6分：基本正确，覆盖主要要点，但缺乏深度或工程视角；"
+                    "7-8分：核心要点覆盖充分，逻辑清晰，有一定工程理解；"
+                    "9-10分：回答完整深入，能主动补充边界条件、工程取舍和实战经验。"
+                    "llm_review 字段：用 1-2 句话精准点评候选人这次回答的核心亮点或主要不足，"
+                    "聚焦技术内容本身，不要复述题目，不要重复 decision.message 的内容。"
                     "decision.message 是你作为面试官说出的话，必须像真实面试官一样自然、有温度。"
                     "先用 1-2 句直接回应候选人的具体内容（肯定说对的点、指出遗漏、或纠正错误），"
                     "再自然地引出追问或下一题，语气要像在真实对话，不要用'好的下一题'这样的机械过渡。"

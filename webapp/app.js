@@ -49,6 +49,8 @@ const roundDimensions = document.getElementById("roundDimensions");
 const scoreEvidenceList = document.getElementById("scoreEvidenceList");
 const interviewChat = document.getElementById("interviewChat");
 const reportNarrative = document.getElementById("reportNarrative");
+const reportConversation = document.getElementById("reportConversation");
+const convList = document.getElementById("convList");
 const actionPlan = document.getElementById("actionPlan");
 const resourceList = document.getElementById("resourceList");
 const voiceButton = document.getElementById("voiceButton");
@@ -58,6 +60,8 @@ const voiceStatus = document.getElementById("voiceStatus");
 const voiceTranscript = document.getElementById("voiceTranscript");
 const autoSpeakToggle = document.getElementById("autoSpeakToggle");
 const stopSpeakButton = document.getElementById("stopSpeakButton");
+const historyPanel = document.getElementById("historyPanel");
+const historyList = document.getElementById("historyList");
 
 apiBaseLabel.textContent = apiBase;
 
@@ -312,6 +316,53 @@ function renderScoreCards(cards = []) {
   });
 }
 
+function renderConversation(conversation) {
+  if (!conversation || conversation.length === 0) {
+    reportConversation.hidden = true;
+    return;
+  }
+  convList.innerHTML = "";
+  conversation.forEach((item, index) => {
+    const isIntro = item.question_id === "SELF_INTRO";
+    const round = document.createElement("div");
+    round.className = "conv-round";
+
+    const qTurn = document.createElement("div");
+    qTurn.className = "conv-turn";
+    qTurn.innerHTML = `<span class="conv-label">面试官</span><p>${item.question || "—"}</p>`;
+
+    const aTurn = document.createElement("div");
+    aTurn.className = "conv-turn answer";
+    aTurn.innerHTML = `<span class="conv-label">我的回答</span><p>${item.answer || "—"}</p>`;
+
+    round.appendChild(qTurn);
+    round.appendChild(aTurn);
+
+    if (item.interviewer_message) {
+      const divider = document.createElement("div");
+      divider.className = "conv-divider";
+      const footer = document.createElement("div");
+      footer.className = "conv-footer";
+      const resp = document.createElement("div");
+      resp.className = "conv-turn";
+      resp.style.flex = "1";
+      resp.innerHTML = `<span class="conv-label">面试官回应</span><p>${item.interviewer_message}</p>`;
+      footer.appendChild(resp);
+      if (item.scored && item.score != null) {
+        const scoreEl = document.createElement("span");
+        scoreEl.className = "conv-score tag";
+        scoreEl.textContent = `${item.score} 分`;
+        footer.appendChild(scoreEl);
+      }
+      round.appendChild(divider);
+      round.appendChild(footer);
+    }
+
+    convList.appendChild(round);
+  });
+  reportConversation.hidden = false;
+}
+
 function renderReportView(viewModel) {
   overallScore.textContent = `${viewModel.summary.overall_score}/10`;
   roundCount.textContent = viewModel.summary.rounds;
@@ -349,6 +400,7 @@ function renderReportView(viewModel) {
     viewModel.recommended_resources.map((item) => `${item.title}: ${item.description}`),
     "暂无内容。"
   );
+  renderConversation(viewModel.conversation || []);
 }
 
 function enableAnswering(enabled) {
@@ -536,6 +588,67 @@ function setupSpeechRecognition() {
   state.recognition = recognition;
 }
 
+function formatSessionDate(iso) {
+  if (!iso) return "未知时间";
+  try {
+    const d = new Date(iso);
+    return `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  } catch {
+    return iso;
+  }
+}
+
+function renderHistory(sessions) {
+  historyList.innerHTML = "";
+  if (!sessions || sessions.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">暂无历史记录，完成一次面试后即可在此查看。</div>';
+    historyPanel.hidden = false;
+    return;
+  }
+  historyPanel.hidden = false;
+  sessions.forEach((s) => {
+    const item = document.createElement("div");
+    item.className = "history-item";
+    item.innerHTML = `
+      <div class="history-meta">
+        <strong>${s.role_label || s.role}</strong>
+        <span>${formatSessionDate(s.created_at)}</span>
+      </div>
+      <div class="history-stats">
+        <span>${s.rounds} 轮</span>
+        <span class="history-score">${s.score != null ? s.score + " 分" : "—"}</span>
+      </div>
+      <button class="ghost-button" type="button">查看报告</button>
+    `;
+    item.querySelector("button").addEventListener("click", async () => {
+      await viewHistoryReport(s.session_id);
+    });
+    historyList.appendChild(item);
+  });
+}
+
+async function viewHistoryReport(sessionId) {
+  try {
+    const payload = await requestJson("/report/view", {
+      method: "POST",
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    renderReportView(payload.view_model);
+    showView("report");
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function loadHistory() {
+  try {
+    const payload = await requestJson("/history", { method: "GET" });
+    renderHistory(payload.sessions || []);
+  } catch {
+    historyPanel.hidden = true;
+  }
+}
+
 async function loadHealth() {
   try {
     const payload = await requestJson("/health", { method: "GET" });
@@ -704,6 +817,7 @@ restartButton.addEventListener("click", () => {
   guidanceText.textContent = "请作答。";
   renderRoundScore(null);
   showView("setup");
+  loadHistory();
 });
 
 window.addEventListener("hashchange", () => {
@@ -735,6 +849,7 @@ async function bootstrap() {
   enableAnswering(false);
   await loadHealth();
   await loadRoles();
+  await loadHistory();
   const initialView = window.location.hash.replace("#", "");
   showView(["setup", "interview", "report"].includes(initialView) ? initialView : "setup", {
     replace: true,
