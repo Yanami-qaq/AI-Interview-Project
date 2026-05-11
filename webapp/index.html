@@ -212,38 +212,11 @@
 
           <div class="metric-grid" id="scoreCards"></div>
 
-          <div class="feedback-panel report-feedback">
-            <div class="score-evidence">
-              <div class="score-evidence-head">
-                <h3>评分明细</h3>
-                <span id="roundConfidence" class="tag muted">未评分</span>
-              </div>
-              <div class="round-score">
-                <strong id="roundScore">--</strong>
-                <span>/10</span>
-              </div>
-              <div id="roundDimensions" class="dimension-list">
-                <div class="empty-line">暂无评分。</div>
-              </div>
-              <div class="evidence-block">
-                <h3>评分依据</h3>
-                <ul id="scoreEvidenceList" class="info-list">
-                  <li>暂无内容。</li>
-                </ul>
-              </div>
-            </div>
-            <div>
-              <h3>表现亮点</h3>
-              <ul id="liveHighlights" class="info-list">
-                <li>报告生成后显示。</li>
-              </ul>
-            </div>
-            <div>
-              <h3>改进建议</h3>
-              <ul id="liveImprovements" class="info-list">
-                <li>报告生成后显示。</li>
-              </ul>
-            </div>
+          <div style="display:none" aria-hidden="true">
+            <span id="roundConfidence"></span>
+            <strong id="roundScore"></strong>
+            <div id="roundDimensions"></div>
+            <ul id="scoreEvidenceList"></ul>
           </div>
 
           <div class="conv-history flat-section" id="reportConversation" hidden>
@@ -252,6 +225,18 @@
           </div>
 
           <div class="report-columns">
+            <div class="flat-section">
+              <h3>表现亮点</h3>
+              <ul id="liveHighlights" class="info-list">
+                <li>报告生成后显示。</li>
+              </ul>
+            </div>
+            <div class="flat-section">
+              <h3>改进建议</h3>
+              <ul id="liveImprovements" class="info-list">
+                <li>报告生成后显示。</li>
+              </ul>
+            </div>
             <div class="flat-section">
               <h3>下一步行动计划</h3>
               <ol id="actionPlan" class="ordered-list">

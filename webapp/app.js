@@ -189,6 +189,7 @@ function confidenceLabel(value) {
 }
 
 function renderRoundScore(evaluation = null) {
+  if (!roundScore) return;
   if (!evaluation) {
     roundScore.textContent = "--";
     roundConfidence.textContent = "未评分";
@@ -369,7 +370,6 @@ function renderReportView(viewModel) {
   weakestMetric.textContent = viewModel.improvements[0]?.text || "继续练习";
   reportNarrative.textContent = viewModel.summary.text;
   renderScoreCards(viewModel.score_cards);
-  renderRoundScore(viewModel.report_evaluation);
   renderList(
     liveHighlights,
     (viewModel.highlights || []).map((item) => item.text || item),
