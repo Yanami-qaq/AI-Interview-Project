@@ -616,9 +616,9 @@ function renderHistory(sessions) {
       </div>
       <div class="history-stats">
         <span>${s.rounds} 轮</span>
-        <span class="history-score">${s.score != null ? s.score + " 分" : "—"}</span>
+        <span class="history-score">${s.score != null ? s.score + " 分" : "未评分"}</span>
       </div>
-      <button class="ghost-button" type="button">查看报告</button>
+      <button class="ghost-button" type="button" style="width:100%">查看报告</button>
     `;
     item.querySelector("button").addEventListener("click", async () => {
       await viewHistoryReport(s.session_id);

@@ -1054,16 +1054,19 @@ button.is-loading::after {
 }
 
 .history-list {
-  padding: 16px clamp(16px, 2.5vw, 28px) clamp(16px, 2.5vw, 28px);
-  display: grid;
+  display: flex;
   gap: 10px;
+  padding: 12px clamp(16px, 2.5vw, 28px) clamp(16px, 2.5vw, 28px);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
 }
 
 .history-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 13px 16px;
+  flex: 0 0 200px;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: white;
@@ -1075,18 +1078,13 @@ button.is-loading::after {
 }
 
 .history-meta {
-  flex: 1;
   display: grid;
   gap: 3px;
-  min-width: 0;
 }
 
 .history-meta strong {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 760;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .history-meta span {
@@ -1097,11 +1095,10 @@ button.is-loading::after {
 .history-stats {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 720;
-  white-space: nowrap;
 }
 
 .history-score {
@@ -1111,8 +1108,7 @@ button.is-loading::after {
 
 .history-empty {
   color: var(--muted);
-  text-align: center;
-  padding: 28px 0 12px;
+  padding: 20px 0 8px;
   font-size: 14px;
 }
 
