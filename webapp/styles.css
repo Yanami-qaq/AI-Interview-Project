@@ -1043,6 +1043,10 @@ button.is-loading::after {
 }
 
 .history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px) 0;
 }
 
@@ -1051,6 +1055,21 @@ button.is-loading::after {
   font-size: clamp(20px, 2.5vw, 28px);
   font-weight: 840;
   letter-spacing: -0.02em;
+}
+
+.history-nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+#historyPageLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 720;
+  min-width: 36px;
+  text-align: center;
 }
 
 .history-list {

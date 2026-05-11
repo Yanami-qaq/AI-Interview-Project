@@ -62,6 +62,10 @@ const autoSpeakToggle = document.getElementById("autoSpeakToggle");
 const stopSpeakButton = document.getElementById("stopSpeakButton");
 const historyPanel = document.getElementById("historyPanel");
 const historyList = document.getElementById("historyList");
+const historyPrevBtn = document.getElementById("historyPrevBtn");
+const historyNextBtn = document.getElementById("historyNextBtn");
+const historyPageLabel = document.getElementById("historyPageLabel");
+const historyState = { sessions: [], page: 0, perPage: 5 };
 
 apiBaseLabel.textContent = apiBase;
 
@@ -598,15 +602,13 @@ function formatSessionDate(iso) {
   }
 }
 
-function renderHistory(sessions) {
+function renderHistoryPage() {
+  const { sessions, page, perPage } = historyState;
+  const totalPages = Math.ceil(sessions.length / perPage);
+  const pageItems = sessions.slice(page * perPage, page * perPage + perPage);
+
   historyList.innerHTML = "";
-  if (!sessions || sessions.length === 0) {
-    historyList.innerHTML = '<div class="history-empty">暂无历史记录，完成一次面试后即可在此查看。</div>';
-    historyPanel.hidden = false;
-    return;
-  }
-  historyPanel.hidden = false;
-  sessions.forEach((s) => {
+  pageItems.forEach((s) => {
     const item = document.createElement("div");
     item.className = "history-item";
     item.innerHTML = `
@@ -625,6 +627,25 @@ function renderHistory(sessions) {
     });
     historyList.appendChild(item);
   });
+
+  historyPrevBtn.disabled = page === 0;
+  historyNextBtn.disabled = page >= totalPages - 1;
+  historyPageLabel.textContent = totalPages > 1 ? `${page + 1} / ${totalPages}` : "";
+}
+
+function renderHistory(sessions) {
+  if (!sessions || sessions.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">暂无历史记录，完成一次面试后即可在此查看。</div>';
+    historyPrevBtn.disabled = true;
+    historyNextBtn.disabled = true;
+    historyPageLabel.textContent = "";
+    historyPanel.hidden = false;
+    return;
+  }
+  historyState.sessions = sessions;
+  historyState.page = 0;
+  historyPanel.hidden = false;
+  renderHistoryPage();
 }
 
 async function viewHistoryReport(sessionId) {
@@ -828,6 +849,21 @@ window.addEventListener("hashchange", () => {
     return;
   }
   showView(target, { replace: true, instant: true });
+});
+
+historyPrevBtn.addEventListener("click", () => {
+  if (historyState.page > 0) {
+    historyState.page--;
+    renderHistoryPage();
+  }
+});
+
+historyNextBtn.addEventListener("click", () => {
+  const totalPages = Math.ceil(historyState.sessions.length / historyState.perPage);
+  if (historyState.page < totalPages - 1) {
+    historyState.page++;
+    renderHistoryPage();
+  }
 });
 
 async function bootstrap() {

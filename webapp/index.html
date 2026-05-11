@@ -111,8 +111,15 @@
 
       <section class="panel history-panel" id="historyPanel" hidden>
         <div class="history-header">
-          <span class="section-kicker">Past Sessions</span>
-          <h2>历史记录</h2>
+          <div>
+            <span class="section-kicker">Past Sessions</span>
+            <h2>历史记录</h2>
+          </div>
+          <div class="history-nav">
+            <button class="mini-button" id="historyPrevBtn" disabled>←</button>
+            <span id="historyPageLabel"></span>
+            <button class="mini-button" id="historyNextBtn" disabled>→</button>
+          </div>
         </div>
         <div id="historyList" class="history-list"></div>
       </section>
