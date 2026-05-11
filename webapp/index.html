@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI模拟面试与能力提升平台</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <h1>AI模拟面试与能力提升平台</h1>
+      </div>
+      <div class="system-panel">
+        <div class="status-pill" id="healthStatus">等待服务连接</div>
+        <div class="speech-control">
+          <span class="speech-label">面试官语音</span>
+          <label class="switch" aria-label="面试官自动朗读">
+            <input id="autoSpeakToggle" type="checkbox" checked>
+            <span class="switch-track"></span>
+          </label>
+          <button class="mini-button" type="button" id="stopSpeakButton">停止朗读</button>
+        </div>
+        <div class="api-meta">
+          <span>API</span>
+          <strong id="apiBaseLabel">http://127.0.0.1:8010</strong>
+        </div>
+      </div>
+    </header>
+
+    <nav class="stepper" aria-label="面试步骤">
+      <div class="step-item active" data-step="setup">
+        <span>01</span>
+        <strong>面试设置</strong>
+      </div>
+      <div class="step-item" data-step="interview">
+        <span>02</span>
+        <strong>模拟面试</strong>
+      </div>
+      <div class="step-item" data-step="report">
+        <span>03</span>
+        <strong>能力总结</strong>
+      </div>
+    </nav>
+
+    <main>
+      <section class="view active" id="setupView">
+        <div class="setup-layout">
+          <section class="panel setup-panel">
+            <div class="panel-header">
+              <span class="section-kicker">Interview Setup</span>
+              <h2>开始模拟面试</h2>
+            </div>
+
+            <div class="setup-brief" aria-label="面试准备概览">
+              <div>
+                <span>岗位</span>
+                <strong>按需选择</strong>
+              </div>
+              <div>
+                <span>难度</span>
+                <strong>灵活设定</strong>
+              </div>
+              <div>
+                <span>主题</span>
+                <strong>可选填写</strong>
+              </div>
+            </div>
+
+            <form id="startForm" class="form-grid">
+              <label>
+                <span>面试岗位</span>
+                <select id="roleSelect" required></select>
+              </label>
+              <label>
+                <span>难度</span>
+                <select id="difficultySelect">
+                  <option value="">不限</option>
+                  <option value="easy">初级</option>
+                  <option value="medium">中级</option>
+                  <option value="hard">高级</option>
+                </select>
+              </label>
+              <label>
+                <span>主题</span>
+                <input id="topicInput" type="text" placeholder="collection / browser / project">
+              </label>
+              <label>
+                <span>题目关键词</span>
+                <input id="queryInput" type="text" placeholder="HashMap / URL / React">
+              </label>
+              <label class="full-width">
+                <span>简历 / 项目经历</span>
+                <textarea id="resumeInput" rows="6" placeholder="粘贴简历摘要、项目经历、技术栈或目标岗位要求。面试官会结合这些内容提问。"></textarea>
+              </label>
+              <button class="primary-button full-width" type="submit">开始模拟面试</button>
+            </form>
+          </section>
+
+          <aside class="setup-media">
+            <figure class="visual-frame setup-photo">
+              <img src="/static/assets/photos/setup-photo.jpg" alt="软件工程师面试准备场景">
+            </figure>
+            <div class="media-caption compact">
+              <strong>准备好后，直接开始。</strong>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="interviewView">
+        <div class="interview-layout">
+          <section class="panel conversation-panel">
+            <div class="panel-header row-header">
+              <div>
+                <span class="section-kicker">Live Interview</span>
+                <h2>模拟面试</h2>
+              </div>
+              <span class="tag" id="questionMeta">未开始</span>
+            </div>
+
+            <div class="question-strip">
+              <span>当前问题</span>
+              <p id="questionText">开始面试后，这里会出现当前问题。</p>
+              <small id="guidanceText">请作答。</small>
+            </div>
+
+            <div class="chat-box" id="interviewChat">
+              <div class="chat-empty">开始面试后，对话记录会显示在这里。</div>
+            </div>
+          </section>
+
+          <aside class="panel answer-panel">
+            <figure class="answer-cover">
+              <img src="/static/assets/photos/interview-photo.jpg" alt="视频语音模拟面试场景">
+              <figcaption>
+                <span>Candidate Console</span>
+                <strong id="sessionIdTag">无 Session</strong>
+              </figcaption>
+            </figure>
+
+            <div class="row-header compact answer-title">
+              <h2>作答区</h2>
+              <span class="tag accent" id="voiceStatus">等待开始</span>
+            </div>
+
+            <form id="answerForm" class="answer-form">
+              <label>
+                <span>文本回答</span>
+                <textarea id="answerInput" rows="8" placeholder="输入回答，或使用下方语音输入..." disabled></textarea>
+              </label>
+
+              <div class="voice-box">
+                <div class="row-header compact">
+                  <h3>语音输入</h3>
+                </div>
+                <div class="voice-transcript" id="voiceTranscript">语音转写内容会显示在这里。</div>
+                <div class="button-row">
+                  <button class="voice-button" type="button" id="voiceButton" disabled>开始录音</button>
+                  <button class="secondary-button" type="button" id="voiceSubmitButton" disabled>使用语音提交</button>
+                  <button class="ghost-button" type="button" id="voiceClearButton" disabled>清空</button>
+                </div>
+              </div>
+
+              <div class="button-row action-row">
+                <button class="secondary-button" type="submit" id="answerButton" disabled>提交文本回答</button>
+                <button class="ghost-button" type="button" id="finishButton" disabled>提前结束</button>
+              </div>
+            </form>
+
+          </aside>
+        </div>
+      </section>
+
+      <section class="view" id="reportView">
+        <section class="panel report-page">
+          <div class="report-cover">
+            <img src="/static/assets/photos/report-photo.jpg" alt="能力报告分析场景">
+            <div>
+              <span class="section-kicker">Final Report</span>
+              <h2>能力总结</h2>
+              <p id="reportNarrative">暂无报告。</p>
+            </div>
+            <button class="ghost-button" type="button" id="restartButton">重新开始</button>
+          </div>
+
+          <div class="report-hero">
+            <div class="score-card hero-score">
+              <span>综合得分</span>
+              <strong id="overallScore">--</strong>
+            </div>
+            <div class="report-summary" id="reportSummary">
+              <div class="score-card">
+                <span>面试轮次</span>
+                <strong id="roundCount">0</strong>
+              </div>
+              <div class="score-card">
+                <span>重点改进</span>
+                <strong id="weakestMetric">待生成</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="metric-grid" id="scoreCards"></div>
+
+          <div class="feedback-panel report-feedback">
+            <div class="score-evidence">
+              <div class="score-evidence-head">
+                <h3>评分明细</h3>
+                <span id="roundConfidence" class="tag muted">未评分</span>
+              </div>
+              <div class="round-score">
+                <strong id="roundScore">--</strong>
+                <span>/10</span>
+              </div>
+              <div id="roundDimensions" class="dimension-list">
+                <div class="empty-line">暂无评分。</div>
+              </div>
+              <div class="evidence-block">
+                <h3>评分依据</h3>
+                <ul id="scoreEvidenceList" class="info-list">
+                  <li>暂无内容。</li>
+                </ul>
+              </div>
+            </div>
+            <div>
+              <h3>表现亮点</h3>
+              <ul id="liveHighlights" class="info-list">
+                <li>报告生成后显示。</li>
+              </ul>
+            </div>
+            <div>
+              <h3>改进建议</h3>
+              <ul id="liveImprovements" class="info-list">
+                <li>报告生成后显示。</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="report-columns">
+            <div class="flat-section">
+              <h3>下一步行动计划</h3>
+              <ol id="actionPlan" class="ordered-list">
+                <li>暂无内容。</li>
+              </ol>
+            </div>
+            <div class="flat-section">
+              <h3>推荐补强方向</h3>
+              <ul id="resourceList" class="info-list">
+                <li>暂无内容。</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

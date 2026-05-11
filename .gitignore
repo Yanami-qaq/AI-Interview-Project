@@ -7,9 +7,11 @@ scripts/.venv/
 .idea/
 scripts/.idea/
 data/tmp/
+runtime/
 *.db
 *.sqlite
 *.sqlite3
 *.sqlite3-journal
+.env
 .__codex_write_test.tmp
 __codex_probe__.tmp

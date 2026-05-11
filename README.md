@@ -19,17 +19,17 @@
 - 主库与补充库格式规范文档
 - 岗位化入库脚本 `scripts/ingest_data.py`
 - 检索验证脚本 `scripts/query_test.py`
+- 最小文本面试流程引擎 `scripts/interview_flow.py`
+- 最小 HTTP 面试接口 `scripts/interview_api.py`
 
 进行中：
 
 - Java RAG 基座收尾
 - 多岗位知识库扩展方案
-- 面试流程引擎设计
+- 面试流程与接口层打通
 
 待完成：
 
-- 第二岗位知识库
-- 后端接口层
 - 面试评估与报告生成
 - 语音链路
 - 前端交互界面
@@ -47,10 +47,20 @@ AI_Interview_Project/
 ├─ docs/
 │  ├─ 项目实施路线图.md
 │  ├─ Java岗位RAG使用说明.md
-│  └─ 知识库与目录规划.md
+│  ├─ 知识库与目录规划.md
+│  ├─ 最小面试流程引擎说明.md
+│  ├─ 最小面试接口说明.md
+│  ├─ 前端报告页对接说明.md
+│  └─ 最小前端页面说明.md
 ├─ scripts/
 │  ├─ ingest_data.py
-│  └─ query_test.py
+│  ├─ query_test.py
+│  ├─ interview_flow.py
+│  └─ interview_api.py
+├─ webapp/
+│  ├─ index.html
+│  ├─ styles.css
+│  └─ app.js
 ├─ models/
 ├─ db/
 └─ README.md
@@ -85,6 +95,10 @@ Java 岗位当前采用：
 详细使用方法见：
 
 - [Java岗位RAG使用说明.md](D:\AI_Interview_Project\docs\Java岗位RAG使用说明.md)
+- [最小面试流程引擎说明.md](D:\AI_Interview_Project\docs\最小面试流程引擎说明.md)
+- [最小面试接口说明.md](D:\AI_Interview_Project\docs\最小面试接口说明.md)
+- [前端报告页对接说明.md](D:\AI_Interview_Project\docs\前端报告页对接说明.md)
+- [最小前端页面说明.md](D:\AI_Interview_Project\docs\最小前端页面说明.md)
 
 ## 常用命令
 
@@ -112,6 +126,57 @@ D:\AI_Interview_Project\scripts\.venv\Scripts\python.exe D:\AI_Interview_Project
   --role java_backend `
   --query "请解释 HashMap 的底层原理"
 ```
+
+### 3. 启动最小面试接口
+
+```powershell
+D:\AI_Interview_Project\scripts\.venv\Scripts\python.exe D:\AI_Interview_Project\scripts\interview_api.py `
+  --host 127.0.0.1 `
+  --port 8010
+```
+
+启动后访问：
+
+- [http://127.0.0.1:8010/app](http://127.0.0.1:8010/app)
+
+### 4. 启用 LLM 面试官评价
+
+复制 `.env.example` 为 `.env`，填入真实模型配置：
+
+```powershell
+Copy-Item .env.example .env
+```
+
+```text
+LLM_JUDGE_ENABLED=1
+LLM_JUDGE_API_URL=https://api.deepseek.com/chat/completions
+LLM_JUDGE_MODEL=deepseek-v4-pro
+LLM_JUDGE_MODE=full
+DEEPSEEK_API_KEY=你的真实密钥
+```
+
+然后正常启动接口即可。也可以不用 `.env`，直接通过启动参数传入：
+
+```powershell
+python scripts\interview_api.py `
+  --host 127.0.0.1 `
+  --port 8010 `
+  --llm-judge-enabled `
+  --llm-judge-api-url https://api.deepseek.com/chat/completions `
+  --llm-judge-model deepseek-v4-pro `
+  --llm-judge-mode full `
+  --llm-judge-api-key-env DEEPSEEK_API_KEY
+```
+
+LLM 接入状态可查看：
+
+- [http://127.0.0.1:8010/llm/status](http://127.0.0.1:8010/llm/status)
+
+`LLM_JUDGE_MODE` 支持：
+
+- `conservative`：贴近规则评分，默认最多偏离 1 分
+- `balanced`：允许 LLM 修正规则遗漏，默认最多偏离 2.5 分
+- `full`：当前推荐，LLM 主导评价，规则评分作为证据底座和失败兜底
 
 ## 当前注意事项
 
